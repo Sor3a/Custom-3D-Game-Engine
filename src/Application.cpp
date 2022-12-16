@@ -316,6 +316,11 @@ int main(void)
 
 
 
+        FrameBuffer depthFBO;
+        DepthTexture depthTexutre;
+        depthFBO.AttachDepthTexture(depthTexutre.GetID());
+
+
         UniformBufferObject Matrices_UniformObject(2*sizeof(glm::mat4),0);
         Matrices_UniformObject.BufferData(0, sizeof(glm::mat4),glm::value_ptr(GameObjectManager::projection));
         //glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction

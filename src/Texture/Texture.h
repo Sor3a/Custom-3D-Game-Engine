@@ -21,6 +21,7 @@ public:
 	std::string _FilePath;
 	Texture(const std::string& path= "res/textures/default_Texture.jpg", const std::string& type="texture_diffuse", unsigned int TextureFilterType = GL_LINEAR, unsigned int ClampType = GL_CLAMP_TO_BORDER, float* borderColor = nullptr, unsigned int MipMapFilter = 0);
 	Texture(const GLvoid* data,unsigned int width= 1280, unsigned int height = 720, unsigned int TextureFilterType = GL_LINEAR, unsigned int ClampType = GL_CLAMP_TO_BORDER, float* borderColor = nullptr);
+	Texture(int a=0){};
 	~Texture();
 	void Bind(unsigned int slot=0) const;
 	virtual void UnBind() const;
@@ -29,4 +30,10 @@ public:
 	inline unsigned int GetID() const { return RendererID; };
 	inline const std::string& GetType() const { return type; };
 	inline std::string SetType(const std::string& new_type) { type = new_type; }
+};
+
+class DepthTexture :public Texture
+{
+public:
+	DepthTexture(unsigned int width= 1024,unsigned int height= 1024);
 };
