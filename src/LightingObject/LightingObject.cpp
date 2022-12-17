@@ -16,7 +16,7 @@ LightingObject::LightingObject(const glm::vec3& color, Shader* shader, Primitive
 
 //:GameObject(shader, nullptr, primitive, position), ambient(amb), diffuse(diff), specular(spec)
 
-void LightingObject::Draw()
+void LightingObject::Draw(Shader* s , glm::mat4 proj, glm::mat4 view )
 {
 
     glm::mat4 model = glm::mat4(1.0f);

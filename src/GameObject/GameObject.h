@@ -32,5 +32,5 @@ public:
 	void setScale(const glm::vec3& scale);
 	void setRotation(const glm::vec3 & rotationAxis,float rotationDegree);
 	void SetPositionRotation(const glm::vec3& position, const glm::vec3& rotationAxis, float rotationDegree);
-	virtual void Draw();
+	virtual void Draw(Shader* s = nullptr,glm::mat4 proj = glm::mat4(1),glm::mat4 view = glm::mat4(1));
 };

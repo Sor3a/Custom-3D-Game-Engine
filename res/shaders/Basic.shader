@@ -14,24 +14,21 @@ uniform mat3 Normal_mat;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
-//uniform mat4 view;
-//uniform mat4 projection;
+uniform mat4 lightSpaceMatrix;
 
-//layout(std140) uniform Matrices
-//{
-//	mat4 projection;
-//	mat4 view;
-//};
+
 
 out vec2 v_TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
+out vec4 FragPosLightSpace;
+
 
 void main()
 {
 	gl_Position = projection * view * model *vec4(position,1.0f);
 	
-
+	FragPosLightSpace = lightSpaceMatrix *model * vec4(position, 1.0f);
 	v_TexCoord = Text_Coor;
 	FragPos = vec3(model * vec4(position, 1.0));
 	Normal = Normal_mat*Normals;
@@ -105,12 +102,14 @@ out vec4 FragColor;
 in vec2 v_TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
+in vec4 FragPosLightSpace;
 
 uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
 uniform samplerCube skybox;
+uniform sampler2D shadowMap;
 
 
 
@@ -120,6 +119,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos,vec3 viewDir, ve
 
 vec3 CalcFlashLight(FlashLight light, vec3 normal, vec3 viewDir, vec3 textur);
 
+float ShadowCalculation(vec4 fragPosLightSpace);
 
 float near = 0.1;
 float far = 100.0;
@@ -229,13 +229,28 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, vec3 textur)
 	float spec = pow(max(dot(normal, halfwayDir), 0), material.shininess);
 	float diff = max(dot(normal, lightDir), 0.0);
 
-	
+	float shadow = ShadowCalculation(FragPosLightSpace);
 
 	vec3 ambient = light.ambient * textur;
 
-	vec3 diffuse = light.diffuse * diff * textur;
+	vec3 diffuse = light.diffuse * diff * textur* (1.0 - shadow);
 
-	vec3 specular = light.specular * spec * texture(material.texture_specular1, v_TexCoord).xyz;
+	vec3 specular = light.specular * spec * texture(material.texture_specular1, v_TexCoord).xyz* (1.0 - shadow);
 
 	return (ambient * material.ambient + diffuse * material.diffuse + specular * material.specular);
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+
+	vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+	projCoords = projCoords * 0.5 + 0.5;
+	// get closest depth value from light’s perspective (using
+	// [0,1] range fragPosLight as coords)
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	// get depth of current fragment from light’s perspective
+	float currentDepth = projCoords.z;
+	// check whether current frag pos is in shadow
+	float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+	return shadow;
 }

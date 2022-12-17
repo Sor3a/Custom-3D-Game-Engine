@@ -62,6 +62,7 @@ Texture::~Texture()
 {
 	GLCall(glDeleteTextures(1, &RendererID));
 }
+Texture::Texture(int a,int b) { std::cout << "depth texture created" << std::endl; }
 void Texture::Bind(unsigned int slot) const
 {
 	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
@@ -118,7 +119,7 @@ unsigned int Texture::TextureFromFile(const char* path)
 }
 
 DepthTexture::DepthTexture(unsigned int width, unsigned int height):
-	Texture(3)
+	Texture(3,7)
 {
 	_width = width;
 	_height = height;

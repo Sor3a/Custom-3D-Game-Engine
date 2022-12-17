@@ -220,7 +220,7 @@ int main(void)
         GameObject obj(&material, &s, &cube_, positions1[0]);
         //LightingObject Lighting_obj(glm::vec3(1, 1, 1),&s1, &cube_light,positions1[1]);
 
-        DirectionalLight directional(glm::vec3(-0.5f, -1.0f, -0.3f), nullptr, glm::vec3(0.1f), glm::vec3(0.8), glm::vec3(0.8));
+        DirectionalLight directional(glm::vec3(2.0f, -1.0f, 1.0f), nullptr, glm::vec3(0.3f), glm::vec3(0.8), glm::vec3(0.8));
 
 
         // pointLight(&s1, &cube_,glm::vec3(2,3,3));
@@ -304,9 +304,9 @@ int main(void)
         TriangleShader.setUniformVec4f("color", glm::vec4(0.5, 0.2, 0, 1));
         float triangleVertices[] =
         {
-            0.0f, 0.0f, 
-            0.5f, 0.0f, 
-            0.5f, 0.5f, 
+            0.0f, 0.0f,
+            0.5f, 0.0f,
+            0.5f, 0.5f,
         };
         VertexArray TriangleArray;
         VertexBuffer TriangleBuffer(quadVertices, sizeof(triangleVertices));
@@ -319,38 +319,79 @@ int main(void)
         FrameBuffer depthFBO;
         DepthTexture depthTexutre;
         depthFBO.AttachDepthTexture(depthTexutre.GetID());
+        depthFBO.CheckIfComplete();
 
+        float near_plane = 1.0f, far_plane = 7.5f;
 
-        UniformBufferObject Matrices_UniformObject(2*sizeof(glm::mat4),0);
-        Matrices_UniformObject.BufferData(0, sizeof(glm::mat4),glm::value_ptr(GameObjectManager::projection));
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+            near_plane, far_plane);
+        glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f,4.0f, -1.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f));
+
+        Shader shadowShader("res/shaders/shadowShader.shader");
+
+        s.setUniform1i("shadowMap", 10);
         //glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction
         while (!glfwWindowShouldClose(window))
         {
 
             Renderer::GetInstance()->StartRenderingImGui();
             /* Render here */
-            fb.Bind();
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            Renderer::GetInstance()->Clear();
+
 
 
             manager.CalculateDeltaTime();
 
-           
+
             camera.CameraWork();
             camera.CameraMoveWithInput(window);
-            //directional.setShaderVariables(&s);
+            directional.setShaderVariables(&s);
 
 
             //if (flashLight.direction != camera.CameraForward)
             //    flashLight.direction = camera.CameraForward;
             //flashLight.setPosition(camera.cameraPos);
-
             //flashLight.setShaderVariables(&s);
 
 
             s.setUniformVec3f("viewPos", camera.cameraPos);
+
+
+
+            glViewport(0, 0, 1024, 1024);
+            depthFBO.Bind();
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            Renderer::GetInstance()->Clear();
             Renderer::GetInstance()->Enable();
+
+
+            //drawing objects
+            for (int i = 0; i < 7; i++)
+            {
+                objects[i].setRotation(glm::normalize(glm::vec3(i, 1, 0.5 * i)), i * 20.0f);
+
+                objects[i].Draw(&shadowShader, lightProjection, lightView);
+            }
+            obj.setScale(glm::vec3(20, 1, 20));
+            obj.Draw(&shadowShader,lightProjection,lightView);
+
+            //sky.Draw(); //draw sky
+
+
+           // glDisable(GL_FRAMEBUFFER_SRGB);
+            // draw the biggest Texture
+            depthFBO.UnBind();
+
+
+
+
+            glViewport(0, 0, 1280, 720);
+            fb.Bind();
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            Renderer::GetInstance()->Clear();
+            Renderer::GetInstance()->Enable();
+
             {
 
 
@@ -368,8 +409,10 @@ int main(void)
                 ImGui::End();
             }
             //gui element 
-            
-            Matrices_UniformObject.BufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera.cameraPos));
+
+            s.Bind();
+            depthTexutre.Bind(10);
+            s.setUniformMat4f("lightSpaceMatrix", lightProjection * lightView);
             //drawing lights
             for (int i = 0; i < 4; i++)
             {
@@ -385,6 +428,7 @@ int main(void)
                 objects[i].Draw();
             }
             obj.setScale(glm::vec3(20, 1, 20));
+            //obj.SetPosition(glm::vec3(0,-5,0));
             obj.Draw();
 
             sky.Draw(); //draw sky
@@ -393,6 +437,12 @@ int main(void)
            // glDisable(GL_FRAMEBUFFER_SRGB);
             // draw the biggest Texture
             fb.UnBind();
+
+
+
+
+
+
             glDisable(GL_DEPTH_TEST);
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -402,10 +452,12 @@ int main(void)
 
             screenTexture.Bind();
             Renderer::GetInstance()->Draw(quadeArray);
-            ////end of the draw of the biggest texture
-           /* Renderer::GetInstance()->Disable();
-            TriangleShader.Bind();
-            Renderer::GetInstance()->Draw(TriangleArray);*/
+            //end of the draw of the biggest texture
+
+
+            //Renderer::GetInstance()->Disable();
+            //TriangleShader.Bind();
+            //Renderer::GetInstance()->Draw(TriangleArray);
 
             Renderer::GetInstance()->EndRendering(window);
 
