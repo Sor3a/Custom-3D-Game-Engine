@@ -12,5 +12,6 @@ public:
 	//void Bind(unsigned int slot = 0) const = delete;
 	void Bind(unsigned int slot =0) const;
 	void UnBind() const;
-	CubeTexture(const std::vector<std::string>&faces);
+	CubeTexture(const std::vector<std::string>&faces); 
+	CubeTexture(unsigned int shadowWidth, unsigned int shadowHeight);
 };

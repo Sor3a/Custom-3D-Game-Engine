@@ -474,6 +474,7 @@
     <None Include="res\shaders\basic1.shader" />
     <None Include="res\shaders\basic3.shader" />
     <None Include="res\shaders\normal.shader" />
+    <None Include="res\shaders\pointLight.shader" />
     <None Include="res\shaders\shadowShader.shader" />
     <None Include="res\shaders\sky.shader" />
     <None Include="src\vendor\glm\detail\func_common.inl" />

@@ -1359,6 +1359,7 @@
     <None Include="res\shaders\sky.shader" />
     <None Include="res\shaders\normal.shader" />
     <None Include="res\shaders\shadowShader.shader" />
+    <None Include="res\shaders\pointLight.shader" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\texture2.png">

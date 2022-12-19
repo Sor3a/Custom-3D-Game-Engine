@@ -119,17 +119,17 @@ int main(void)
 
         };
         glm::vec3 positions1[] = {
-            glm::vec3(0,-2,  5),
+            glm::vec3(0,-2,  0),
               glm::vec3(2.5f,2,  4.0f),
-              glm::vec3(-3.5f,0.2,  3.0f),
+              glm::vec3(-3.5f,1,  3.0f),
               glm::vec3(15.5f, 1.5,  -2.0f),
               glm::vec3(13,6,  1),
-              glm::vec3(8.5f,0.5,  8.0f),
-             glm::vec3(-1.5f,0.5,  -9.0f),
+              glm::vec3(8.5f,0.9,  8.0f),
+             glm::vec3(-1.5f,1.5,  -9.0f),
               glm::vec3(9.0f, 1,  -1.0f),
         };
         glm::vec3 lighPositions[] = {
-            glm::vec3(17,1,  -10),
+            glm::vec3(4,9,  -5),
             glm::vec3(20,  0,  20),
             glm::vec3(-3,1.2f,-50),
             glm::vec3(-30,1,  6),
@@ -201,7 +201,7 @@ int main(void)
 
 
 
-        PointLight PointsLights[4] = {
+        PointLight PointsLights[] = {
             PointLight(&s1, &cube_,lighPositions[0],glm::vec3(0.1f),glm::vec3(2)),
              PointLight(&s1, &cube_,lighPositions[1],glm::vec3(0.1f),glm::vec3(2)),
               PointLight(&s1, &cube_,lighPositions[2],glm::vec3(0.1f)),
@@ -220,7 +220,7 @@ int main(void)
         GameObject obj(&material, &s, &cube_, positions1[0]);
         //LightingObject Lighting_obj(glm::vec3(1, 1, 1),&s1, &cube_light,positions1[1]);
 
-        DirectionalLight directional(glm::vec3(2.0f, -1.0f, 1.0f), nullptr, glm::vec3(0.3f), glm::vec3(0.8), glm::vec3(0.8));
+        DirectionalLight directional(glm::vec3(2.0f, -1.0f, 1.0f), nullptr, glm::vec3(0.3f), glm::vec3(2), glm::vec3(0.8));
 
 
         // pointLight(&s1, &cube_,glm::vec3(2,3,3));
@@ -292,8 +292,6 @@ int main(void)
 
         CubeTexture SkyTexture(faces);
         SkyBox sky(SkyTexture);
-        s.setUniform1i("skybox", 2);
-        SkyTexture.Bind(2);
 
 
 
@@ -321,17 +319,38 @@ int main(void)
         depthFBO.AttachDepthTexture(depthTexutre.GetID());
         depthFBO.CheckIfComplete();
 
-        float near_plane = 1.0f, far_plane = 7.5f;
+        float near_plane = 0.5f, far_plane = 50.0f;
 
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+        glm::mat4 lightProjection = glm::ortho(-15.0f, 15.0f, -15.0f, 15.0f,
             near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f,4.0f, -1.0f),
+        glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f,8.0f, -1.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f));
 
         Shader shadowShader("res/shaders/shadowShader.shader");
 
+
+        shadowShader.UnBind();
         s.setUniform1i("shadowMap", 10);
+        s.setUniform1i("depthMap", 11);
+        s.UnBind();
+
+        FrameBuffer depthPointLightFB;
+        CubeTexture CubedepthTexture(1024, 1024);
+        depthPointLightFB.AttachDepthCubeTexture(CubedepthTexture.GetID());
+        depthPointLightFB.CheckIfComplete();
+        float aspect = 1.0f;
+        float near = 1.0f;
+        float far = 25.0f;
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect,near, far);
+        
+
+        Shader pointLightShadowShader("res/shaders/pointLight.shader");
+
+
+        pointLightShadowShader.setUniform1f("far_plane", far);
+       depthPointLightFB.UnBind();
+       CubedepthTexture.UnBind();
         //glEnable(GL_FRAMEBUFFER_SRGB); //gamma correction
         while (!glfwWindowShouldClose(window))
         {
@@ -364,7 +383,7 @@ int main(void)
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             Renderer::GetInstance()->Clear();
             Renderer::GetInstance()->Enable();
-
+            glCullFace(GL_FRONT);
 
             //drawing objects
             for (int i = 0; i < 7; i++)
@@ -373,17 +392,61 @@ int main(void)
 
                 objects[i].Draw(&shadowShader, lightProjection, lightView);
             }
+            glCullFace(GL_BACK); 
             obj.setScale(glm::vec3(20, 1, 20));
             obj.Draw(&shadowShader,lightProjection,lightView);
-
-            //sky.Draw(); //draw sky
-
-
-           // glDisable(GL_FRAMEBUFFER_SRGB);
-            // draw the biggest Texture
             depthFBO.UnBind();
 
 
+
+
+
+            glViewport(0, 0, 1024, 1024);
+            depthPointLightFB.Bind();
+            Renderer::GetInstance()->Clear();
+            Renderer::GetInstance()->Enable();
+            CubedepthTexture.Bind();
+
+            std::vector<glm::mat4> shadowTransforms;
+
+            glm::vec3 lightPos = PointsLights[0].getPosition();
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+            shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos,
+                lightPos + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+
+            for (int i = 0; i < 6; i++)
+            {
+                std::string ann = "shadowMatrices[" + std::to_string(i) + "]";
+                pointLightShadowShader.setUniformMat4f(ann, shadowTransforms[i]);
+            }
+            pointLightShadowShader.setUniformVec3f("lightPos", lightPos);
+
+            for (int i = 0; i < 7; i++)
+            {
+                objects[i].setRotation(glm::normalize(glm::vec3(i, 1, 0.5 * i)), i * 20.0f);
+
+                objects[i].Draw(&pointLightShadowShader,glm::mat4(0), glm::mat4(0));
+            }
+            obj.setScale(glm::vec3(20, 1, 20));
+            obj.Draw(&pointLightShadowShader, glm::mat4(0), glm::mat4(0));
+            CubedepthTexture.UnBind();
+            depthPointLightFB.UnBind();
 
 
             glViewport(0, 0, 1280, 720);
@@ -411,8 +474,11 @@ int main(void)
             //gui element 
 
             s.Bind();
+            CubedepthTexture.Bind(11);
             depthTexutre.Bind(10);
             s.setUniformMat4f("lightSpaceMatrix", lightProjection * lightView);
+            s.setUniformVec3f("lightPos", PointsLights[0].getPosition());
+            s.setUniform1f("far_plane", far);
             //drawing lights
             for (int i = 0; i < 4; i++)
             {

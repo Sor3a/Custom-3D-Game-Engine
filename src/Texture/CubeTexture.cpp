@@ -41,6 +41,19 @@ CubeTexture::CubeTexture(const std::vector<std::string>& faces)
 	Texture_Filtre(GL_LINEAR);
 	Clamping_Texture(GL_CLAMP_TO_EDGE,nullptr);
 }
+CubeTexture::CubeTexture(unsigned int width, unsigned int height)
+{
+	glGenTextures(1, &RendererID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, RendererID);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+			width, height, 0, GL_DEPTH_COMPONENT,
+			GL_FLOAT, NULL);
+
+	Texture_Filtre(GL_NEAREST);
+	Clamping_Texture(GL_CLAMP_TO_EDGE, nullptr);
+	UnBind();
+}
 void CubeTexture::Bind(unsigned int slot) const
 {
 	glActiveTexture(GL_TEXTURE0+ slot);

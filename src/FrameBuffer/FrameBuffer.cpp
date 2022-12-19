@@ -30,6 +30,14 @@ void FrameBuffer::AttachDepthTexture(unsigned int texture) const
 
 
 }
+void FrameBuffer::AttachDepthCubeTexture(unsigned int texture) const
+{
+	Bind();
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 bool FrameBuffer::CheckIfComplete() const
 {
 	Bind();
