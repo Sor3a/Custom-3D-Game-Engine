@@ -22,6 +22,6 @@ public:
 	void InitializeDirectionalLight(Shader* s);
 	void RenderShadowTexture(Scene *scene,Camera *camera);
 	inline void BindShadowMapTexture() { depthTexutre->Bind(10); }
-	inline glm::mat4 getLightSpaceMatrix() { return lightProjection * lightView; }
+	inline glm::mat4 getLightSpaceMatrix() { return lightProjection * lightView; } 
 	~DirectionalLight();
 };

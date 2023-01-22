@@ -95,31 +95,29 @@ void myScene::Render(Shader* s,glm::mat4 proj,glm::mat4 view)
 void myScene::Update(GLFWwindow* window)
 {
     camera->CameraWork();
-    if (player->getActive() == true)
+    if (player->getActive() == true) //if the player is still alive
     {
-        glm::vec3 direction = glm::vec3(camera->CameraForward.x, 0, camera->CameraForward.z);
+        glm::vec3 direction = glm::vec3(camera->CameraForward.x, 0, camera->CameraForward.z); //get the direction of the player movement from the camera forward
 
-
-        if (forwardSpeed < playerSpeedMax)
+        if (forwardSpeed < playerSpeedMax) //add the player speed if it's not maximum
             forwardSpeed += GameObjectManager::deltaTime * 3;
 
+        player->position += forwardSpeed * GameObjectManager::deltaTime * direction * 0.1f; //move the player based on the speed and the direction
 
-        player->position += forwardSpeed * GameObjectManager::deltaTime * direction * 0.1f;// *CameraForward;
-
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            if (player->position.x > -6.5f)
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) 
+            if (player->position.x > -6.5f)  //move the player if he press A and still not in the edge of the plane
                 player->position -= glm::normalize(glm::cross(camera->CameraForward, camera->cameraUp)) * playerSpeed * GameObjectManager::deltaTime;
+        
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            if (player->position.x < 6.5f)
+            if (player->position.x < 6.5f) //move the player if he press D and still not in the edge of the plane
             player->position += glm::normalize(glm::cross(camera->CameraForward, camera->cameraUp)) * playerSpeed * GameObjectManager::deltaTime;
 
-        glm::vec3 cameraPos = camera->cameraPos;
+        glm::vec3 cameraPos = camera->cameraPos; //get the camera position
 
-        camera->cameraPos = glm::vec3(cameraPos.x, cameraPos.y, player->position.z + 10);
+        camera->cameraPos = glm::vec3(cameraPos.x, cameraPos.y, player->position.z + 10); // make the camera follow the player
 
 
-        if (player->position.z < -590)
+        if (player->position.z < -590) // stop the game and let the player know that he win when he reaches the end
         {
             whatToShow = "you win";
             player->setActive(false);
@@ -128,7 +126,7 @@ void myScene::Update(GLFWwindow* window)
         }
         //(590 is the last point of the plane)
 
-        for (int i = 0; i < objects.size(); i++)
+        for (int i = 0; i < objects.size(); i++) //detection for every object in the game if he hit or not
         {
             if (glm::abs(player->position.z - objects[i]->position.z) < 2.0f)
                 if (glm::abs(player->position.x - objects[i]->position.x) < 2.1f)
@@ -142,7 +140,7 @@ void myScene::Update(GLFWwindow* window)
         }
     }
     else
-        showWinLostUI(whatToShow);
+        showWinLostUI(whatToShow); //tell the player if he win or lost
 }
 
 void myScene::showWinLostUI(std::string whatToShow)
