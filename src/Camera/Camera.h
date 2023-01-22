@@ -17,12 +17,13 @@ private:
 	float yaw = 0, pitch = 0;
 	bool change = false;
 
-protected:
+
 
 	//glm::vec3 CameraForward = glm::vec3(0.0f, 0.0f, -10.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	
 public:
-	glm::vec3 CameraForward = glm::vec3(0.0f, 0.0f, -10.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 CameraForward = glm::vec3(0.0f, -2.0f, -10.0f);
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
 	inline static const glm::mat4 &getView() { return view; }
 	void CameraWork();

@@ -4,18 +4,18 @@
 #include "../Material/Material.h"
 #include "../Model/Model.h"
 #include "../SpeeDEngine/Drawable.h"
+
 class GameObject
 {
+
 protected:
 	Shader* shader;
 	//Primitive* primitive_;
 	glm::vec3 rotationAxis;
-
+	bool isActive;
 	float rotationDegree;
 	void PassMaterial();
 	Drawable* drawable_;
-	Material _Material;
-	Shader _shader;
 	bool isModel = false;
 	//Model* model;
 public:
@@ -30,6 +30,8 @@ public:
 	inline ~GameObject() {if (isModel) { delete drawable_; std::cout << "delete model" << std::endl; }}
 	void SetPosition(const glm::vec3& position);
 	void setScale(const glm::vec3& scale);
+	inline void setActive(bool a) { isActive = a; }
+	inline bool getActive() { return isActive; }
 	void setRotation(const glm::vec3 & rotationAxis,float rotationDegree);
 	void SetPositionRotation(const glm::vec3& position, const glm::vec3& rotationAxis, float rotationDegree);
 	virtual void Draw(Shader* s = nullptr,glm::mat4 proj = glm::mat4(1),glm::mat4 view = glm::mat4(1));

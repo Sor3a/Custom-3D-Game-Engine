@@ -5,7 +5,8 @@
 GameObject::GameObject(Shader* shader,  Primitive* primitive, const glm::vec3& position,const glm::vec3& scale ,const glm::vec3& rotationAxis, float rotationDegree):
     shader(shader), drawable_(primitive),position(position)
 {
-    material = &_Material;
+    isActive = true;
+    material = GameObjectManager::GetInstance()->getDefaultMaterial();
     this->rotationAxis = rotationAxis;
     this->rotationDegree = rotationDegree;
     this->scale = scale;
@@ -17,7 +18,8 @@ GameObject::GameObject(Shader* shader,  Primitive* primitive, const glm::vec3& p
 GameObject::GameObject(Material* mat, Primitive* primitive, const glm::vec3& position, const glm::vec3& scale, const glm::vec3& rotationAxis, float rotationDegree):
     material(mat), drawable_(primitive),position(position),scale(scale),rotationAxis(rotationAxis),rotationDegree(rotationDegree)
 {
-    shader = &_shader;
+    isActive = true;
+    shader = GameObjectManager::GetInstance()->getDefaultShader();
     if (shader != nullptr)
         shader->setUniformVec4f("lightColor", glm::vec4(1, 1, 1, 1));
     //model = nullptr;
@@ -26,8 +28,8 @@ GameObject::GameObject(Primitive* primitive, const glm::vec3& position, const gl
     drawable_(primitive),position(position),scale(scale),rotationAxis(rotationAxis),rotationDegree(rotationDegree)
 {
     //model = nullptr;
-    material = &_Material;
-    shader = &_shader;
+    isActive = true;
+    shader = GameObjectManager::GetInstance()->getDefaultShader();
     if (shader != nullptr)
         shader->setUniformVec4f("lightColor", glm::vec4(1, 1, 1, 1));
     
@@ -35,8 +37,9 @@ GameObject::GameObject(Primitive* primitive, const glm::vec3& position, const gl
 GameObject::GameObject(Material* mat,Shader* shader, Primitive* primitive, const glm::vec3& position, const glm::vec3& scale, const glm::vec3& rotationAxis, float rotationDegree) : 
     shader(shader), drawable_(primitive), position(position)
 {
+    isActive = true;
    // model = nullptr;
-    if (shader == nullptr) shader = &_shader;
+    if (shader == nullptr) shader = GameObjectManager::GetInstance()->getDefaultShader();
     this->rotationAxis = rotationAxis;
     this->rotationDegree = rotationDegree;
     this->scale = scale;
@@ -47,10 +50,11 @@ GameObject::GameObject(Material* mat,Shader* shader, Primitive* primitive, const
 GameObject::GameObject(const char* path, Shader* shader, const glm::vec3& position, const glm::vec3& scale, const glm::vec3& rotationAxis, float rotationDegree):
     shader(shader),position(position),scale(scale),rotationAxis(rotationAxis),rotationDegree(rotationDegree)
 {
+    isActive = true;
     drawable_ = new Model(path);
     isModel = true;
     //std::cout << (typeid(*drawable_).name()==typeid(Model).name()) << std::endl;
-    material = &_Material;
+    material = GameObjectManager::GetInstance()->getDefaultMaterial();
    // primitive_ = nullptr;
 }
 
@@ -74,41 +78,46 @@ void GameObject::SetPositionRotation(const glm::vec3& position, const glm::vec3&
 }
 void GameObject::Draw(Shader* s, glm::mat4 proj, glm::mat4 view)
 {
-    Shader* tmp = shader;
-    if (s != nullptr)
+    if (isActive)
     {
-        shader = s;
+        Shader* tmp = shader;
+        if (s != nullptr)
+        {
+            shader = s;
+        }
+        if (proj == glm::mat4(1)) proj = GameObjectManager::projection;
+        if (view == glm::mat4(1)) view = Camera::getView();
+        glm::mat4 model = glm::mat4(1.0f);
+
+        if (position != glm::vec3(0, 0, 0))
+            model = glm::translate(model, position);
+
+        if (rotationDegree != 0)
+            model = glm::rotate(model, glm::radians(rotationDegree), rotationAxis);
+
+        if (scale != glm::vec3(0, 0, 0))
+            model = glm::scale(model, scale);
+
+        //glm::mat4 result = GameObjectManager::projection * Camera::getView() * model;
+        if (proj != glm::mat4(0))
+            shader->setUniformMat4f("projection", proj);
+        if (view != glm::mat4(0))
+            shader->setUniformMat4f("view", view);
+        shader->setUniformMat4f("model", model);
+        if (s == nullptr)
+        {
+            shader->setUniformMat3f("Normal_mat", glm::mat3(glm::inverse(model)), GL_TRUE);
+            //shader->setUniformVec4f("material.color",_Material.Color);
+            PassMaterial();
+        }
+
+
+        if (drawable_)
+            drawable_->Draw(*shader);
+        shader = tmp;
+
     }
-    if (proj == glm::mat4(1)) proj = GameObjectManager::projection;
-    if (view == glm::mat4(1)) view = Camera::getView();
-    glm::mat4 model = glm::mat4(1.0f);
-
-    if (position != glm::vec3(0, 0, 0))
-        model = glm::translate(model, position);
-
-    if (rotationDegree != 0)
-        model = glm::rotate(model, glm::radians(rotationDegree), rotationAxis);
-
-    if (scale != glm::vec3(0, 0, 0))
-        model = glm::scale(model, scale);
-
-    //glm::mat4 result = GameObjectManager::projection * Camera::getView() * model;
-    if (proj != glm::mat4(0))
-        shader->setUniformMat4f("projection", proj);
-    if (view != glm::mat4(0))
-        shader->setUniformMat4f("view", view);
-    shader->setUniformMat4f("model", model);
-    if (s == nullptr)
-    {
-        shader->setUniformMat3f("Normal_mat", glm::mat3(glm::inverse(model)), GL_TRUE);
-        //shader->setUniformVec4f("material.color",_Material.Color);
-        PassMaterial();
-    }
-
-
-    if (drawable_)
-        drawable_->Draw(*shader);
-    shader = tmp;
+    
 }
 void GameObject::PassMaterial()
 {

@@ -12,6 +12,6 @@ private:
 	unsigned int VAO,EBO;
 	Shader skyShader;
 public:
-	SkyBox(CubeTexture& cubeTexture);
+	SkyBox(const std::vector<std::string>& faces);
 	void Draw();
 };

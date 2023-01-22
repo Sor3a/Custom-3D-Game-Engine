@@ -158,7 +158,9 @@
     <ClCompile Include="src\Camera\Camera.cpp" />
     <ClCompile Include="src\FrameBuffer\FrameBuffer.cpp" />
     <ClCompile Include="src\FrameBuffer\RenderBufferObject.cpp" />
+    <ClCompile Include="src\FrameRenderer\FrameRenderer.cpp" />
     <ClCompile Include="src\GameObject\GameObject.cpp" />
+    <ClCompile Include="src\GAME\myScene.cpp" />
     <ClCompile Include="src\LightingObject\DirectionalLight\DirectionalLight.cpp" />
     <ClCompile Include="src\LightingObject\FlashLight\FlashLight.cpp" />
     <ClCompile Include="src\LightingObject\LightingObject.cpp" />
@@ -191,7 +193,9 @@
     <ClInclude Include="src\Camera\Camera.h" />
     <ClInclude Include="src\FrameBuffer\FrameBuffer.h" />
     <ClInclude Include="src\FrameBuffer\RenderBufferObject.h" />
+    <ClInclude Include="src\FrameRenderer\FrameRenderer.h" />
     <ClInclude Include="src\GameObject\GameObject.h" />
+    <ClInclude Include="src\GAME\myScene.h" />
     <ClInclude Include="src\LightingObject\DirectionalLight\DirectionalLight.h" />
     <ClInclude Include="src\LightingObject\FlashLight\FlashLight.h" />
     <ClInclude Include="src\LightingObject\LightingObject.h" />
@@ -202,6 +206,7 @@
     <ClInclude Include="src\Model\Model.h" />
     <ClInclude Include="src\Primitives\Primitives.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Shader\Shader.h" />
     <ClInclude Include="src\SkyBox\SkyBox.h" />
     <ClInclude Include="src\SpeeDEngine\Drawable.h" />

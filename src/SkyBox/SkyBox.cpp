@@ -1,9 +1,11 @@
 #include "SkyBox.h"
 #include "../SpeeDEngine/GameObjectManager.h"
 #include "../Camera/Camera.h"
-SkyBox::SkyBox(CubeTexture& cubeTexture) :
-    cubeTexture(&cubeTexture), skyShader("res/shaders/sky.shader")
+SkyBox::SkyBox(const std::vector<std::string>& faces) :
+     skyShader("res/shaders/sky.shader")
 {
+    
+    cubeTexture = new CubeTexture(faces);
     skyShader.setUniform1i("skybox", 0);
     unsigned int cube_elements[36] = {
         // front

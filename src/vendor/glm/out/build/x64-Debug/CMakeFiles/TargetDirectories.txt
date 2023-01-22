@@ -1,0 +1,2 @@
+C:/Users/Sor3a/Desktop/SOR3A/OpenGL/Learning/OpenGL/src/vendor/glm/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Sor3a/Desktop/SOR3A/OpenGL/Learning/OpenGL/src/vendor/glm/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

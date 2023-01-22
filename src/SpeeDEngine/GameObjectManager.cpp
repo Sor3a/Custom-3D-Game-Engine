@@ -4,11 +4,18 @@
 
 GameObjectManager::GameObjectManager()
 {
-    projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 200.0f);
     deltaTime = 0;
 }
 
+GameObjectManager* GameObjectManager::GetInstance()
+{
+    if (instance == nullptr)
+        instance = new GameObjectManager();
 
+    return instance;
+
+}
 //GameObject* GameObjectManager::Create_Primitive(  Shader& shader, Primitive& primitive, Texture* texture = nullptr, const glm::vec3& position,const glm::vec3& scale, const glm::vec3& rotationAxis, float rotationDegree)
 //{
 //    GameObject* a = new GameObject(&shader ,texture, &primitive, position, scale,rotationAxis, rotationDegree);

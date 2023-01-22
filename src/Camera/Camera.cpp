@@ -43,15 +43,15 @@ void Camera::CameraMoveWithInput(GLFWwindow * window)
 	if (!change)
 	{
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-		glm::vec3 direction = glm::vec3(CameraForward.x, 0, CameraForward.z);
-		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			cameraPos += cameraSpeed * GameObjectManager::deltaTime * direction;// *CameraForward;
-		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			cameraPos -= cameraSpeed * GameObjectManager::deltaTime * direction;// *CameraForward;
-		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			cameraPos -= glm::normalize(glm::cross(CameraForward, cameraUp)) * cameraSpeed * GameObjectManager::deltaTime;
-		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			cameraPos += glm::normalize(glm::cross(CameraForward, cameraUp)) * cameraSpeed * GameObjectManager::deltaTime;
+		//glm::vec3 direction = glm::vec3(CameraForward.x, 0, CameraForward.z);
+		////if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		//	cameraPos += cameraSpeed * GameObjectManager::deltaTime * direction*0.1f;// *CameraForward;
+		////if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		////	cameraPos -= cameraSpeed * GameObjectManager::deltaTime * direction;// *CameraForward;
+		//if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		//	cameraPos -= glm::normalize(glm::cross(CameraForward, cameraUp)) * cameraSpeed * GameObjectManager::deltaTime;
+		//if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		//	cameraPos += glm::normalize(glm::cross(CameraForward, cameraUp)) * cameraSpeed * GameObjectManager::deltaTime;
 		if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 			change = true;
 	}

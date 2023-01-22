@@ -111,6 +111,12 @@
     <ClCompile Include="src\UniformBufferObject\UnfiormBufferObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GAME\myScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FrameRenderer\FrameRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Renderer\Renderer.h">
@@ -945,6 +951,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UniformBufferObject\UniformBufferObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GAME\myScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FrameRenderer\FrameRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
